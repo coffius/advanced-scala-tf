@@ -70,7 +70,7 @@ object Example extends IOApp.Simple with Example:
   private def doRealWork(in: Input): CtxIO[Output] = in.length.pure
   private def verify(ctx: Context): CtxIO[Boolean] = ctx.name.nonEmpty.pure
   override def run: IO[Unit] =
-    // type definitions are
+    // type definitions are for clarity only
     val layer4: Layer4[CtxIO] = Impl4(doRealWork)
     val layer3: Layer3[CtxIO] = Impl3(layer4)
     val layer2: Layer2[CtxIO] = Impl2(verify, layer3)
