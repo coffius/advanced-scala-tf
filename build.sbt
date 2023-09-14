@@ -4,6 +4,7 @@ import Dependencies._
 ThisBuild / scalaVersion := "3.3.0"
 ThisBuild / version      := "0.0.1"
 ThisBuild / organization := "io.koff"
+ThisBuild / scalacOptions ++= Seq("--source:future")
 
 lazy val root = project
   .in(file("."))
@@ -14,6 +15,8 @@ lazy val `context-passing` = project
   .in(file("context-passing"))
   .settings(libraryDependencies ++= allCats)
 
-lazy val `effect-gathering` = project.in(file("effect-gathering"))
+lazy val `effect-gathering` = project
+  .in(file("effect-gathering"))
+  .settings(libraryDependencies ++= allCats)
 
 lazy val `error-handling` = project.in(file("error-handling"))
