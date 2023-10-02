@@ -1,15 +1,16 @@
 package io.koff.tf.effect_gathering
 
+import cats.Monad
 import cats.effect.std.Console
-import cats.{Applicative, Monad}
-import cats.syntax.functor.*
-import cats.syntax.flatMap.*
-import TellExtension.*
 import cats.effect.{IO, IOApp}
-import cats.syntax.show.*
 import cats.syntax.applicative.*
+import cats.syntax.flatMap.*
+import cats.syntax.functor.*
+import cats.syntax.show.*
+import io.koff.tf.effect_gathering.BasicTypes.*
+import io.koff.tf.effect_gathering.TellExtension.*
 
-trait Example2 extends BasicTypes {
+trait Example2 {
 
   /** This is a logger defined as capability. Pay attention that its methods as equivalent to
     * `TagLog`

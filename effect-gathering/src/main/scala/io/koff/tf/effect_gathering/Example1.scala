@@ -2,7 +2,7 @@ package io.koff.tf.effect_gathering
 
 import cats.data.{Chain, WriterT}
 import cats.effect.IOApp
-import cats.{Monad, Show}
+import cats.{Monad}
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import cats.syntax.show.*

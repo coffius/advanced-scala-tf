@@ -4,7 +4,11 @@ import Dependencies._
 ThisBuild / scalaVersion := "3.3.0"
 ThisBuild / version      := "0.0.1"
 ThisBuild / organization := "io.koff"
-ThisBuild / scalacOptions ++= Seq("--source:future")
+ThisBuild / scalacOptions ++= Seq(
+  "--source:future",
+  "-deprecation",
+  "-Ykind-projector:underscores"
+)
 
 lazy val root = project
   .in(file("."))
