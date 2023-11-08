@@ -1,29 +1,23 @@
 package io.koff.tf.context_passing
 
-import cats.Applicative
-import cats.mtl.Ask
 import zio.*
+import zio.interop.catz.mtl.*
+import zio.interop.catz.*
 
 object ZIOExample extends ZIOAppDefault with Example:
-  import zio.ZIO
-  import zio.interop.catz.*
   final case class User(name: String)
   override type Context = User
   override type Input   = String
   override type Output  = Int
 
   private type CtxIO[A] = ZIO[Context, Throwable, A]
-  private def doRealWork(in: Input): CtxIO[Output] = Exit.succeed(in.length)
-  private def println(in: String): CtxIO[Unit]     = Console.printLine(in)
-  private def verify(ctx: Context): CtxIO[Boolean] = Exit.succeed(ctx.name.nonEmpty)
+  private def doRealWork(in: Input): CtxIO[Output] =
+    Exit.succeed(in.length)
+  private def println(in: String): CtxIO[Unit] =
+    Console.printLine(in)
+  private def verify(ctx: Context): CtxIO[Boolean] =
+    Exit.succeed(ctx.name.nonEmpty)
 
-  implicit def zioAsk[R1: Tag, R <: R1, E](implicit
-      ev: Applicative[ZIO[R, E, _]]
-  ): Ask[ZIO[R, E, _], R1] =
-    new Ask[ZIO[R, E, _], R1] {
-      override def applicative: Applicative[ZIO[R, E, _]] = ev
-      override def ask[R2 >: R1]: ZIO[R, E, R2]           = ZIO.environment[R1].map(_.get)
-    }
   override def run: ZIO[Any & ZIOAppArgs & Scope, Any, Any] =
     // type definitions are here for clarity only
     val layer4: Layer4[CtxIO] = Impl4[CtxIO](doRealWork, println)
@@ -37,8 +31,10 @@ object ZIOExample extends ZIOAppDefault with Example:
 
     for
       _ <- Console.print("Let's go!")
+      // Construct a program that requires a context value
       ctxProgram = layer1.operation1(input)
-      // result <- ctxProgram.provide(ZLayer.succeed(validCtx))
-      result <- ctxProgram.provide(ZLayer.succeed(invalidCtx))
-      _      <- Console.printLine(s"result: $result")
+      // Pass the context value to run the program
+      result <- ctxProgram.provide(ZLayer.succeed(validCtx))
+//    result <- ctxProgram.provide(ZLayer.succeed(invalidCtx))
+      _ <- Console.printLine(s"result: $result")
     yield ()

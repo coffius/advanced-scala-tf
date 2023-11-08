@@ -6,15 +6,6 @@ import cats.{Monad, MonadError}
 
 trait Example {
 
-  /** Alternatives for context passing.
-    *
-    * There are several alternative methods for context passing in Scala:
-    *   - Java's `ThreadLocal`
-    *   - [[https://typelevel.org/cats-effect/docs/core/io-local IOLocal from cats-effect]]
-    *   - [[https://zio.dev/reference/state-management/fiberref/ FiberRef from ZIO]]
-    */
-  object RenderDoc
-
   /** First of all, let's define our types that we are going to use in this example.
     *
     *   - `Context` - is a representation of the context we are going to pass across our calls'
@@ -65,14 +56,18 @@ trait Example {
         if (result)
           layer3.operation3(in)
         else
-          // Better way of working with errors is going to be shown in the `error-handling` part
+          // Better way of working with errors
+          // is going to be shown in the `error-handling` part
           MT.raiseError(new RuntimeException(s"Could not verify context: $context"))
     } yield output
 
   final class Impl3[F[_]](layer4: Layer4[F]) extends Layer3[F]:
     override def operation3(in: Input): F[Output] = layer4.operation4(in)
 
-  final class Impl4[F[_]: Monad](doRealWork: Input => F[Output], println: String => F[Unit])(using
+  final class Impl4[F[_]: Monad](
+      doRealWork: Input => F[Output],
+      println: String => F[Unit]
+  )(using
       A: AskCtx[F]
   ) extends Layer4[F]:
     override def operation4(in: Input): F[Output] = for

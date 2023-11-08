@@ -3,15 +3,17 @@ package io.koff.tf.context_passing
 import cats.data.Kleisli
 import cats.effect.{IO, IOApp}
 import cats.effect.std.Console
+import cats.syntax.applicative.*
 
 object CatsExample extends IOApp.Simple with Example:
-  import cats.syntax.applicative.*
   final case class User(name: String)
   override type Context = User
   override type Input   = String
   override type Output  = Int
 
+  // Add Context to IO using Kleisli
   private type CtxIO[A] = Kleisli[IO, Context, A]
+
   private def doRealWork(in: Input): CtxIO[Output] = in.length.pure
   private def println(in: String): CtxIO[Unit]     = Console[CtxIO].println(in)
   private def verify(ctx: Context): CtxIO[Boolean] = ctx.name.nonEmpty.pure
