@@ -76,10 +76,4 @@ trait Example {
     override def operation1B(in: Input1): F[Output1] = ???
     override def operation2A(in: Input2): F[Output2] = ???
     override def operation2B(in: Input2): F[Output2] = ???
-
-  trait LowLvlService[F[_]]:
-    def operation3(in: Input1): F[Output1]
-
-  trait Layer4[F[_]]:
-    def operation4(in: Input1): F[Output1]
 }

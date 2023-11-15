@@ -13,22 +13,21 @@ import io.koff.tf.effect_gathering.TellExtension.*
 trait Example2 {
 
   /** This is a logger defined as capability. Pay attention that its methods as equivalent to
-    * `TagLog`
+    * the `TagLog` structure.
     */
   trait Log[F[_]]:
     def info(tag: String, input: String, output: String): F[Unit]
     def error(tag: String, input: String, error: Throwable): F[Unit]
 
-  /** This trait can be implemented in two ways */
-
-  /** An usual implementation - when logs are sent to the outside world */
+  /** This trait can be implemented in two ways. */
+  /** An usual implementation - when logs are sent to the outside world when an effect is executed. */
   protected final class ConsoleTagLog[F[_]: Console] extends Log[F]:
     override def info(tag: String, input: String, output: String): F[Unit] =
       Console[F].println(s"INFO - tag: $tag; input: $input; output: $output")
     override def error(tag: String, input: String, error: Throwable): F[Unit] =
       Console[F].println(s"ERROR - tag: $tag; input: $input; error: $error")
 
-  /** In this implementation we put our logs into the F[_] effect using the Tell[..] type class. */
+  /** Another way is to put our logs into the F[_] effect using the Tell[..] type class. */
   protected final class InEffectTagLog[F[_]: TellTagLogs] extends Log[F]:
     override def info(tag: String, input: String, output: String): F[Unit] =
       TagLog.Info(tag, input, output).tell[F]
