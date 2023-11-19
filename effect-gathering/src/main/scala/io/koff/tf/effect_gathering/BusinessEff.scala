@@ -9,7 +9,6 @@ object EvtLog {
 }
 
 import cats.data.{AndThen, Chain, IndexedStateT, NonEmptyList as NeColl}
-import io.koff.tf.effect_gathering.EffState.EffSuccess
 //type EffState[EvtLog, Err] = Either[Err, EvtLog]
 // final case class EffState[Eff, EvtLog, Err](effs: Chain[Eff], either: Either[Err, EvtLog])
 // final class IndexedStateT[F[_], SA, SB, A](val runF: F[SA => F[(SB, A)]])
@@ -26,34 +25,29 @@ import io.koff.tf.effect_gathering.EffState.EffSuccess
 //    })
 //}
 
-sealed trait EffState[Err, -SA, +SB, +A] {
-  def flatMap[B, SC](
-      fas: A => EffState[Err, SB, SC, B]
-  ): EffState[Err, SA, SC, B] = {
-    this match
-      case EffState.EffSuccess(run) =>
-        EffSuccess { sa =>
-          val (sb, a)                       = run(sa)
-          val res: EffState[Err, SB, SC, B] = fas(a)
-          res match
-            case EffSuccess(run)                   => run(sb)
-            case EffState.EffError(err, lastState) => ???
-        }
-      case EffState.EffError(err, lastState) => EffState.EffError(err, lastState)
-  }
-}
-object EffState {
-  final case class EffSuccess[SA, SB, A](run: SA => (SB, A)) extends EffState[Nothing, SA, SB, A]
-  final case class EffError[Err, S](err: Err, lastState: S)
-      extends EffState[Err, S, Nothing, Nothing]
-}
+sealed trait Eff[Ef, +Evt, Err, A]:
+  def flatMap[Evt1 >: Evt, B](f: A => Eff[Ef, Evt1, Err, B]): Eff[Ef, Evt1, Err, B] = this match
+    case Eff.Empty(effLog1, either) =>
+      either match
+        case Left(error) => Eff.Empty(effLog1, Left(error))
+        case Right(a) =>
+          f(a) match
+            case Eff.Empty(effLog2, either)       => Eff.Empty(effLog1 ++ effLog2, either)
+            case Eff.NonEmpty(effLog2, events, b) => Eff.NonEmpty(effLog1 ++ effLog2, events, b)
+    case Eff.NonEmpty(effLog1, events1, a) =>
+      f(a) match
+        case Eff.Empty(effLog2, either) =>
+          either match
+            case Left(error) => Eff.Empty(effLog1 ++ effLog2, Left(error))
+            case Right(b)    => Eff.NonEmpty(effLog1 ++ effLog2, events1, b)
+        case Eff.NonEmpty(effLog2, events2, b) =>
+          Eff.NonEmpty(effLog1 ++ effLog2, events1.concatNel(events2), b)
 
-sealed trait BusinessEff[Log, Evt, Err, A]
-
-object BusinessEff {
-  final case class Pure[Log, Evt, Err, A](log: Log, either: Either[Err, (Evt, A)])
-      extends BusinessEff[Log, Evt, Err, A]
-  final case class Map[Log, Evt, Err, A, B](f: A => B) extends BusinessEff[Log, Evt, Err, A]
-  final case class FlatMap[Log, Evt, Err, A, B](f: A => BusinessEff[Log, Evt, Err, B])
-      extends BusinessEff[Log, Evt, Err, A]
-}
+object Eff:
+  final case class Empty[Ef, Err, A](effLog: Chain[Ef], either: Either[Err, A])
+      extends Eff[Ef, Nothing, Err, A]
+  final case class NonEmpty[Ef, Evt, Err, A](
+      effLog: Chain[Ef],
+      events: NeColl[Evt],
+      value: A
+  ) extends Eff[Ef, Evt, Err, A]
