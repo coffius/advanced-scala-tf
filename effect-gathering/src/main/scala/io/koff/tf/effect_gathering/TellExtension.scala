@@ -12,5 +12,6 @@ object TellExtension:
     T.tell(collOne)
 
   extension [L](l: L)
-    def tell[F[_]](using Tell[F, Chain[L]]): F[Unit] =
+    def 
+    tell[F[_]](using Tell[F, Chain[L]]): F[Unit] =
       tellOne(l)

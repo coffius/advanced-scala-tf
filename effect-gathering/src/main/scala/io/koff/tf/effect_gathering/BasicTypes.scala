@@ -12,11 +12,10 @@ object BasicTypes {
   type Output1 = Int
   type Output2 = Double
 
-  // This is a type alias for gathering effects in a collection(cats' Chain)
-  final type TellLogs[F[_], EffElem] = Tell[F, Chain[EffElem]]
+  final type TellLogs[F[_], Elem] = Tell[F, Chain[Elem]]
 
   /** Adding this additional type alias to make our types a bit more readable. */
-  final type TellTagLogs[F[_]] = TellLogs[F, TagLog]
+  final type TellTagLogs[F[_]] = TellLogs[F, Log]
 
   /** Our end-of-the-world effect */
   type Eff[T] = WriterT[IO, Chain[TagLog], T]

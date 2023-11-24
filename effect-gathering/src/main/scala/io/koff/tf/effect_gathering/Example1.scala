@@ -10,11 +10,6 @@ import io.koff.tf.effect_gathering.TellExtension.*
 import BasicTypes.*
 
 trait Example1 {
-
-  /** Example of half structured log - its cases have additional info. We are going to use it as a
-    * data structure for gathering info needed to be logged.
-    */
-
   /** This is a basic service with two operations */
   trait Service[F[_]]:
     def operation1(in: Input1): F[Output1]
@@ -34,17 +29,17 @@ trait Example1 {
     override def operation1(in: Input1): F[Output1] = for
       out1 <- lowLvlOp1(in)
       // Here we see how log instances can be added to F[_]
-      _    <- tellOne(TagLog.Info("operation1", in.show, out1.show))
+      _    <- tellOne(Log.Info("operation1", in.show, out1.show))
       out2 <- lowLvlOp2(out1)
-      _    <- tellOne(TagLog.Info("operation1", in.show, out2.show))
+      _    <- tellOne(Log.Info("operation1", in.show, out2.show))
     yield out1
 
     override def operation2(in: Input2): F[Output2] = for
       out1 <- lowLvlOp3(in)
       // and here as well
-      _    <- TagLog.Info("operation2", in.show, out1.show).tell[F]
+      _    <- Log.Info("operation2", in.show, out1.show).tell[F]
       out2 <- lowLvlOp2(out1)
-      _    <- TagLog.Info("operation2", in.show, out2.show).tell[F]
+      _    <- Log.Info("operation2", in.show, out2.show).tell[F]
     yield out2
 }
 

@@ -30,10 +30,10 @@ trait Example2 {
   /** Another way is to put our logs into the F[_] effect using the Tell[..] type class. */
   protected final class InEffectTagLog[F[_]: TellTagLogs] extends Log[F]:
     override def info(tag: String, input: String, output: String): F[Unit] =
-      TagLog.Info(tag, input, output).tell[F]
+      Log.Info(tag, input, output).tell[F]
 
     override def error(tag: String, input: String, error: Throwable): F[Unit] =
-      TagLog.Error(tag, input, error).tell[F]
+      Log.Error(tag, input, error).tell[F]
 
   /** Now let's take out previous service and use this Log[..] capability */
   trait Service2[F[_]]:
