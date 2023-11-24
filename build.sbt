@@ -23,4 +23,8 @@ lazy val `effect-gathering` = project
   .in(file("effect-gathering"))
   .settings(libraryDependencies ++= allCats)
 
+lazy val `event-sourced-effect` = project
+  .in(file("event-sourced-effect"))
+  .settings(libraryDependencies ++= allCats)
+
 lazy val `error-handling` = project.in(file("error-handling"))
