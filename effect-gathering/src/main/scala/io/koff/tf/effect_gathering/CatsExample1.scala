@@ -10,6 +10,7 @@ import io.koff.tf.effect_gathering.TellExtension.*
 import BasicTypes.*
 
 trait Example1 {
+
   /** This is a basic service with two operations */
   trait Service[F[_]]:
     def operation1(in: Input1): F[Output1]
@@ -28,7 +29,7 @@ trait Example1 {
   ) extends Service[F]:
     override def operation1(in: Input1): F[Output1] = for
       out1 <- lowLvlOp1(in)
-      // Here we see how log instances can be added to F[_]
+      // Here we see how log elements can be added to F[_]
       _    <- tellOne(Log.Info("operation1", in.show, out1.show))
       out2 <- lowLvlOp2(out1)
       _    <- tellOne(Log.Info("operation1", in.show, out2.show))
@@ -43,7 +44,7 @@ trait Example1 {
     yield out2
 }
 
-object Example1 extends Example1 with IOApp.Simple:
+object CatsExample1 extends Example1 with IOApp.Simple:
   import cats.effect.IO
   import cats.effect.std.Console
 
