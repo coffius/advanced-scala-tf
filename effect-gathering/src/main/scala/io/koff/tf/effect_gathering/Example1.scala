@@ -1,19 +1,27 @@
 package io.koff.tf.effect_gathering
 
-import cats.data.{Chain, WriterT}
-import cats.effect.IOApp
-import cats.{Monad}
+import io.koff.tf.effect_gathering.BasicTypes.TellTagLogs
+import cats.{Monad, Show}
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import cats.syntax.show.*
 import io.koff.tf.effect_gathering.TellExtension.*
-import BasicTypes.*
 
 trait Example1 {
+  type Input1
+  type Input2
+  type Output1
+  type Output2
+
+  given input1Show: Show[Input1]
+  given input2Show: Show[Input2]
+  given output1Show: Show[Output1]
+  given output2Show: Show[Output2]
 
   /** This is a basic service with two operations */
   trait Service[F[_]]:
     def operation1(in: Input1): F[Output1]
+
     def operation2(in: Input2): F[Output2]
 
   /** This is its implementation. As constructor params it requires two low level operations. In a
@@ -43,27 +51,3 @@ trait Example1 {
       _    <- Log.Info("operation2", in.show, out2.show).tell[F]
     yield out2
 }
-
-object CatsExample1 extends Example1 with IOApp.Simple:
-  import cats.effect.IO
-  import cats.effect.std.Console
-
-  override def run: IO[Unit] =
-    val lowLvlOp1: Input1 => Eff[Output1]  = s => WriterT.liftF(IO.pure(s.length))
-    val lowLvlOp2: Output1 => Eff[Output2] = i => WriterT.liftF(IO.pure(i.toDouble))
-    val lowLvlOp3: Input2 => Eff[Output1]  = l => WriterT.liftF(IO.pure(l.size))
-
-    val service: Service[Eff] = ServiceImpl(lowLvlOp1, lowLvlOp2, lowLvlOp3)
-
-    val program = for
-      result1 <- service.operation1("hello")
-      result2 <- service.operation2("hello".toList)
-    yield (result1, result2)
-
-    for
-      _                    <- Console[IO].println("Hello WriterT")
-      (logs, (res1, res2)) <- program.run
-      _                    <- Console[IO].println(s"logs: $logs")
-      _                    <- Console[IO].println(s"result1: $res1")
-      _                    <- Console[IO].println(s"result2: $res2")
-    yield ()
