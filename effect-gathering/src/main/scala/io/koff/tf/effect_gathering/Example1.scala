@@ -21,7 +21,6 @@ trait Example1 {
   /** This is a basic service with two operations */
   trait Service[F[_]]:
     def operation1(in: Input1): F[Output1]
-
     def operation2(in: Input2): F[Output2]
 
   /** This is its implementation. As constructor params it requires two low level operations. In a
