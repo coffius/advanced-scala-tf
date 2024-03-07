@@ -8,19 +8,20 @@ import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import cats.syntax.show.*
 import io.koff.tf.effect_gathering.BasicTypes.*
-import io.koff.tf.effect_gathering.TellExtension.*
+import io.koff.tf.effect_gathering.TellExtension.{*, given}
 
-trait Example2 {
+trait Example2 extends BasicTypes {
 
-  /** This is a logger defined as capability. Pay attention that its methods as equivalent to
-    * the `TagLog` structure.
+  /** This is a logger defined as capability. Pay attention that its methods as equivalent to the
+    * `TagLog` structure.
     */
   trait Log[F[_]]:
     def info(tag: String, input: String, output: String): F[Unit]
     def error(tag: String, input: String, error: Throwable): F[Unit]
 
   /** This trait can be implemented in two ways. */
-  /** An usual implementation - when logs are sent to the outside world when an effect is executed. */
+  /** An usual implementation - when logs are sent to the outside world when an effect is executed.
+    */
   protected final class ConsoleTagLog[F[_]: Console] extends Log[F]:
     override def info(tag: String, input: String, output: String): F[Unit] =
       Console[F].println(s"INFO - tag: $tag; input: $input; output: $output")
@@ -28,7 +29,7 @@ trait Example2 {
       Console[F].println(s"ERROR - tag: $tag; input: $input; error: $error")
 
   /** Another way is to put our logs into the F[_] effect using the Tell[..] type class. */
-  protected final class InEffectTagLog[F[_]: TellTagLogs] extends Log[F]:
+  protected final class InEffectTagLog[F[_]](implicit T: TellLogs[F]) extends Log[F]:
     override def info(tag: String, input: String, output: String): F[Unit] =
       Log.Info(tag, input, output).tell[F]
 
@@ -77,7 +78,7 @@ object Example2 extends Example2 with IOApp.Simple:
     yield (result1, result2)
 
   private given Log[IO]  = new ConsoleTagLog[IO]
-  private given Log[Eff] = new InEffectTagLog[Eff]
+  private given Log[Eff] = new InEffectTagLog[Eff]()
   override def run: IO[Unit] = for
     _ <- Console[IO].println("Hello ConsoleTagLog")
     // Run the program using a console impl of `Log[..]`

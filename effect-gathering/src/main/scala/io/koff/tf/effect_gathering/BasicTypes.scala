@@ -9,7 +9,7 @@ import cats.instances.list.*
 import cats.instances.int.*
 import cats.instances.double.*
 
-object BasicTypes {
+trait BasicTypes {
   // These are our types that we are going to use in our examples
   type Input1  = String
   type Input2  = List[Char]
@@ -20,12 +20,15 @@ object BasicTypes {
   given input2Show: Show[Input2]   = catsStdShowForList[Char]
   given output1Show: Show[Output1] = catsStdShowForInt
   given output2Show: Show[Output2] = catsStdShowForDouble
+}
 
-  final type TellLogs[F[_], Elem] = Tell[F, Chain[Elem]]
-
+object BasicTypes {
   /** Adding this additional type alias to make our types a bit more readable. */
-  final type TellTagLogs[F[_]] = TellLogs[F, Log]
+  final type TellLogs[F[_]] = Tell[F, Log]
 
   /** Our end-of-the-world effect */
   type Eff[T] = WriterT[IO, Chain[Log], T]
+
+  /** Reliable version of the effect */
+  type REff[T] = ReliableWriterT[IO, Throwable, Chain[Log], T]
 }

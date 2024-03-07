@@ -17,10 +17,10 @@ lazy val root = project
 
 lazy val `context-passing` = project
   .in(file("context-passing"))
-  .settings(libraryDependencies ++= allCats)
+  .settings(libraryDependencies ++= all)
 
 lazy val `effect-gathering` = project
   .in(file("effect-gathering"))
-  .settings(libraryDependencies ++= allCats)
+  .settings(libraryDependencies ++= all)
 
 lazy val `error-handling` = project.in(file("error-handling"))
