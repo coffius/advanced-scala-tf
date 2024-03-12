@@ -13,8 +13,7 @@ object CatsExample extends Example1 with IOApp.Simple:
     val lowLvlOp2: Output1 => REff[Output2] = i => Applicative[REff].pure(i.toDouble)
     val lowLvlOp3: Input2 => REff[Output1]  = l => Applicative[REff].pure(l.size)
 
-    val service: Service[REff] =
-      ServiceImpl[REff](lowLvlOp1, lowLvlOp2, lowLvlOp3)
+    val service: Service[REff] = ServiceImpl[REff](lowLvlOp1, lowLvlOp2, lowLvlOp3)
 
     val program = for
       result1 <- service.operation1("hello")
