@@ -6,7 +6,7 @@ import cats.syntax.functor.*
 import cats.syntax.show.*
 import io.koff.tf.effect_gathering.BasicTypes
 
-/** In this example we use `LogCapability[F]` instead of `T: TellTagLogs[F]` */
+/** In this example we use `LogCapability[F]` instead of `T: TellLogs[F]` */
 trait LogCapabilityExample extends BasicTypes {
   trait Service[F[_]]:
     def operation1(in: Input1): F[Output1]

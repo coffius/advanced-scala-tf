@@ -5,12 +5,13 @@ import zio.*
 import zio.interop.catz.*
 import zio.prelude.Writer
 
-object ZIOExample extends ZIOAppDefault with Example1:
+object ZIOExample extends ZIOAppDefault with Example1 {
   type REff[T] = Writer[Log, T]
+
   override def run: ZIO[Any & ZIOAppArgs & Scope, Any, Any] =
-    val lowLvlOp1: Input1 => REff[Output1]  = s => Writer.succeed(s.length)
+    val lowLvlOp1: Input1 => REff[Output1] = s => Writer.succeed(s.length)
     val lowLvlOp2: Output1 => REff[Output2] = i => Writer.succeed(i.toDouble)
-    val lowLvlOp3: Input2 => REff[Output1]  = l => Writer.succeed(l.size)
+    val lowLvlOp3: Input2 => REff[Output1] = l => Writer.succeed(l.size)
 
     val service: Service[REff] = ServiceImpl(lowLvlOp1, lowLvlOp2, lowLvlOp3)
 
@@ -25,3 +26,4 @@ object ZIOExample extends ZIOAppDefault with Example1:
       _ <- LogProcessor.processLogs[Task, Chunk](logs)
       _ <- Console.printLine(s"result: $resultOrErr")
     yield ()
+}

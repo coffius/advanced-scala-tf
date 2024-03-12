@@ -1,10 +1,11 @@
 package io.koff.tf.effect_gathering.error
 
-import cats.{Applicative, MonadError, MonadThrow}
+import cats.MonadThrow
 import cats.data.{Chain, WriterT}
 import cats.effect.SyncIO
-import io.koff.tf.effect_gathering.ReliableWriterT
 import cats.mtl.Tell
+import io.koff.tf.effect_gathering.ReliableWriterT
+import io.koff.tf.effect_gathering.TellExtension.given
 
 object ErrorExample {
   type Logs = Chain[Log]
@@ -16,7 +17,7 @@ object ErrorExample {
 
     def eff1: Eff1[Int] = for
       // this log record is lost
-      _ <- Tell[Eff1, Logs].tell(Chain.one(Log("It is going to fail")))
+      _ <- Tell[Eff1, Log].tell(Log("It is going to fail"))
       // we can see only this error
       _ <- MonadThrow[Eff1].raiseError(new RuntimeException("failure"))
     yield 1
@@ -27,11 +28,11 @@ object ErrorExample {
     type Eff2[A] = ReliableWriterT[SyncIO, Throwable, Logs, A]
 
     def eff2Success: Eff2[Int] =
-      for _ <- Tell[Eff2, Logs].tell(Chain.one(Log("Successful program")))
-      yield 10
+      for _ <- Tell[Eff2, Log].tell(Log("Successful program"))
+    yield 10
 
     def eff2RaiseError: Eff2[Int] = for
-      _ <- Tell[Eff2, Logs].tell(Chain.one(Log("Faulty program")))
+      _ <- Tell[Eff2, Log].tell(Log("Faulty program"))
       _ <- MonadThrow[Eff2].raiseError(new RuntimeException("test error"))
     yield 10
 
