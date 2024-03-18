@@ -7,7 +7,7 @@ import cats.effect.{IO, IOApp}
 import io.koff.tf.effect_gathering.BasicTypes.REff
 import io.koff.tf.effect_gathering.TellExtension.TellForChain
 
-object CatsExample extends Example1 with IOApp.Simple{
+object CatsExample extends Example1 with IOApp.Simple {
   override def run: IO[Unit] =
     val lowLvlOp1: Input1 => REff[Output1]  = s => Applicative[REff].pure(s.length)
     val lowLvlOp2: Output1 => REff[Output2] = i => Applicative[REff].pure(i.toDouble)

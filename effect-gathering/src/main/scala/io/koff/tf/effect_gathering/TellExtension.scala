@@ -4,7 +4,7 @@ import cats.Functor
 import cats.data.Chain
 import cats.mtl.Tell
 
-object TellExtension:
+object TellExtension {
   given TellForChain[F[_], L](using T: Tell[F, Chain[L]]): Tell[F, L] =
     new Tell[F, L]:
       def functor: Functor[F] = T.functor
@@ -13,3 +13,4 @@ object TellExtension:
   extension [L](l: L)
     def tell[F[_]](using T: Tell[F, L]): F[Unit] =
       T.tell(l)
+}

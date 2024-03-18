@@ -18,17 +18,18 @@ trait LogCapabilityExample extends BasicTypes {
       lowLvlOp3: Input2 => F[Output1]
   ) extends Service[F]:
     private val Log: LogCapability[F] = LogCapability[F]
+    
     override def operation1(in: Input1): F[Output1] = for
       out1 <- lowLvlOp1(in)
-      _    <- Log.info("operation1", in.show, out1.show)
+      _    <- Log.info("operation1: out1", in.show, out1.show)
       out2 <- lowLvlOp2(out1)
-      _    <- Log.info("operation1", in.show, out2.show)
+      _    <- Log.info("operation1: out2", in.show, out2.show)
     yield out1
 
     override def operation2(in: Input2): F[Output2] = for
       out1 <- lowLvlOp3(in)
-      _    <- Log.info("operation2", in.show, out1.show)
+      _    <- Log.info("operation2: out1", in.show, out1.show)
       out2 <- lowLvlOp2(out1)
-      _    <- Log.info("operation2", in.show, out2.show)
+      _    <- Log.info("operation2: out2", in.show, out2.show)
     yield out2
 }
