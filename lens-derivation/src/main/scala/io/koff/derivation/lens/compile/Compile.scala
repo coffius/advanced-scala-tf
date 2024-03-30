@@ -13,7 +13,7 @@ object Compile {
     case _ => error("value of A not found in Tuple")
   def main(args: Array[String]): Unit = {
     inline def tuple1: (Long, String, Double) = (1L, "string", 0.0d)
-    val result                                = getFromTuple(tuple1)
+    val result: String                        = getFromTuple[(Long, String, Double), String](tuple1)
     println(result)
   }
 
