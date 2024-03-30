@@ -1,7 +1,7 @@
 import sbt._
 import Dependencies._
 
-ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / version      := "0.0.1"
 ThisBuild / organization := "io.koff"
 ThisBuild / scalacOptions ++= Seq(
