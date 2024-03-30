@@ -23,4 +23,8 @@ lazy val `effect-gathering` = project
   .in(file("effect-gathering"))
   .settings(libraryDependencies ++= all)
 
+lazy val `lens-derivation` = project
+  .in(file("lens-derivation"))
+  .settings(libraryDependencies ++= all)
+
 lazy val `error-handling` = project.in(file("error-handling"))
