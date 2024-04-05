@@ -1,16 +1,16 @@
 package io.koff.derivation.lens.compile
 
 import io.koff.derivation.lens.*
+import io.koff.derivation.lens.compile.Macros.*
 
 import scala.compiletime.*
 import scala.deriving.*
 import scala.deriving.Mirror.Of
-import scala.quoted.{Expr, Quotes, Type}
-import Macros.*
 
-object Compile2 {
-  private inline def cantDeriveCompileError[S, A] =
-    error("Can't derive DGetter[" + showType[S] + ", " + showType[A] + "]")
+object Derivation {
+  private inline def cantDeriveCompileError[S, A]: Nothing =
+    error("Can't derive " + showType[DGetter[S, A]])
+
   inline transparent given deriveGetter2[S, A](using
       mir: Mirror.Of[S]
   ): DGetter[S, A] = inline mir match
@@ -85,8 +85,10 @@ object Compile2 {
     printField[User, City](user)
     printField[User, Street](user)
     printField[User, Address](user)
+
+//  Can't derive DGetter[io.koff.derivation.lens.User, CustomUnknownType]
 //  type CustomUnknownType
-//  printField[User, CustomUnknownType](user) // Can't derive DGetter[io.koff.derivation.lens.User, CustomUnknownType]
+//  printField[User, CustomUnknownType](user)
   }
 
   private def printField[S, A](s: S)(using dg: DGetter[S, A]): Unit =
