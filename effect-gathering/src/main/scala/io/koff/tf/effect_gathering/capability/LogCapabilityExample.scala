@@ -12,7 +12,7 @@ trait LogCapabilityExample extends BasicTypes {
     def operation1(in: Input1): F[Output1]
     def operation2(in: Input2): F[Output2]
 
-  protected final class ServiceImpl[F[_]: Monad: LogCapability](
+  protected final class ServiceImpl[F[_]: {Monad, LogCapability}](
       lowLvlOp1: Input1 => F[Output1],
       lowLvlOp2: Output1 => F[Output2],
       lowLvlOp3: Input2 => F[Output1]

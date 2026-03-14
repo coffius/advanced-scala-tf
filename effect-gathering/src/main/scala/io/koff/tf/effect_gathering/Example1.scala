@@ -22,7 +22,7 @@ trait Example1 extends BasicTypes {
       lowLvlOp1: Input1 => F[Output1],
       lowLvlOp2: Output1 => F[Output2],
       lowLvlOp3: Input2 => F[Output1]
-  )(implicit
+  )(using
       M: Monad[F],
       T: TellLogs[F]
   ) extends Service[F]:

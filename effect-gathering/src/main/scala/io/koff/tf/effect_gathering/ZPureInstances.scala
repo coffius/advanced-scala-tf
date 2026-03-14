@@ -12,12 +12,12 @@ import java.nio.charset.Charset
 object ZPureInstances {
   given CatsConsoleForZIO: CatsConsole[Task] = new CatsConsole[Task]:
     override def readLineWithCharset(charset: Charset): Task[String] = Console.readLine
-    override def print[A](a: A)(implicit S: Show[A]): Task[Unit]     = Console.print(a.show)
-    override def println[A](a: A)(implicit S: Show[A]): Task[Unit]   = Console.printLine(a.show)
-    override def error[A](a: A)(implicit S: Show[A]): Task[Unit]     = Console.printError(a.show)
-    override def errorln[A](a: A)(implicit S: Show[A]): Task[Unit] = Console.printLineError(a.show)
+    override def print[A](a: A)(using S: Show[A]): Task[Unit]     = Console.print(a.show)
+    override def println[A](a: A)(using S: Show[A]): Task[Unit]   = Console.printLine(a.show)
+    override def error[A](a: A)(using S: Show[A]): Task[Unit]     = Console.printError(a.show)
+    override def errorln[A](a: A)(using S: Show[A]): Task[Unit] = Console.printLineError(a.show)
 
-  given ZPureMonad[W, S, R, E]: Monad[[X] =>> ZPure[W, S, S, R, E, X]] =
+  given ZPureMonad: [W, S, R, E] => Monad[[X] =>> ZPure[W, S, S, R, E, X]] =
     new Monad[[X] =>> ZPure[W, S, S, R, E, X]]:
       override def flatMap[A, B](fa: ZPure[W, S, S, R, E, A])(
           f: A => ZPure[W, S, S, R, E, B]
@@ -33,7 +33,7 @@ object ZPureInstances {
       override def pure[A](x: A): ZPure[W, S, S, R, E, A] =
         ZPure.succeed(x)
 
-  given ZPureTell[W, S, R, E]: Tell[[X] =>> ZPure[W, S, S, R, E, X], W] =
+  given ZPureTell: [W, S, R, E] => Tell[[X] =>> ZPure[W, S, S, R, E, X], W] =
     new Tell[[X] =>> ZPure[W, S, S, R, E, X], W]:
       def functor: Functor[[X] =>> ZPure[W, S, S, R, E, X]] = ZPureMonad[W, S, R, E]
 

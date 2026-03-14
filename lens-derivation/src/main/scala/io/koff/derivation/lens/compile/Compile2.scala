@@ -11,9 +11,7 @@ import Macros.*
 object Compile2 {
   private inline def cantDeriveCompileError[S, A] =
     error("Can't derive DGetter[" + showType[S] + ", " + showType[A] + "]")
-  inline transparent given deriveGetter2[S, A](using
-      mir: Mirror.Of[S]
-  ): DGetter[S, A] = inline mir match
+  inline transparent given deriveGetter2: [S, A] => (mir: Mirror.Of[S]) => DGetter[S, A] = inline mir match
     case _: Mirror.SumOf[S] => error("Sum types does not supported yet")
     case m: Mirror.ProductOf[S] =>
       inline makeProductGetter2[S, A](using m) match

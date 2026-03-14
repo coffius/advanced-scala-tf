@@ -9,21 +9,21 @@ import cats.syntax.semigroup.*
 
 /** Replacement for WriterT capable of keeping written value in case of error */
 final case class ReliableWriterT[F[_], E, W, A](run: F[(W, Either[E, A])]) {
-  def mapAll[W1, E1, A1](f: (W, Either[E, A]) => (W1, Either[E1, A1]))(implicit
+  def mapAll[W1, E1, A1](f: (W, Either[E, A]) => (W1, Either[E1, A1]))(using
       F: Functor[F]
   ): ReliableWriterT[F, E1, W1, A1] =
     ReliableWriterT(F.map(run)(f.tupled))
 
-  def map[B](f: A => B)(implicit F: Functor[F]): ReliableWriterT[F, E, W, B] = mapAll {
+  def map[B](f: A => B)(using F: Functor[F]): ReliableWriterT[F, E, W, B] = mapAll {
     case (w, ea) => (w, ea.map(f))
   }
 
-  def put(w: W)(implicit F: Functor[F]): ReliableWriterT[F, E, W, A] = ReliableWriterT(F.map(run) {
+  def put(w: W)(using F: Functor[F]): ReliableWriterT[F, E, W, A] = ReliableWriterT(F.map(run) {
     case (_, either) => (w, either)
   })
   def flatMap[B](
       f: A => ReliableWriterT[F, E, W, B]
-  )(implicit W: Semigroup[W], F: MonadError[F, E]): ReliableWriterT[F, E, W, B] =
+  )(using W: Semigroup[W], F: MonadError[F, E]): ReliableWriterT[F, E, W, B] =
     ReliableWriterT(run.flatMap {
       case (w, Left(e)) => F.pure((w, Left(e)))
       case (w1, Right(x)) =>
@@ -32,7 +32,7 @@ final case class ReliableWriterT[F[_], E, W, A](run: F[(W, Either[E, A])]) {
 
   def handleWith(
       f: E => ReliableWriterT[F, E, W, A]
-  )(implicit W: Semigroup[W], F: MonadError[F, E]): ReliableWriterT[F, E, W, A] =
+  )(using W: Semigroup[W], F: MonadError[F, E]): ReliableWriterT[F, E, W, A] =
     ReliableWriterT(run.flatMap {
       case (w, Right(x)) => F.pure((w, Right(x)))
       case (w1, Left(e)) =>
@@ -41,10 +41,7 @@ final case class ReliableWriterT[F[_], E, W, A](run: F[(W, Either[E, A])]) {
 }
 
 object ReliableWriterT {
-  implicit def instance[F[_], E, W](implicit
-      F: MonadError[F, E],
-      W: Monoid[W]
-  ): MonadError[ReliableWriterT[F, E, W, *], E] =
+  given instance: [F[_], E, W] => (F: MonadError[F, E], W: Monoid[W]) => MonadError[ReliableWriterT[F, E, W, *], E] =
     new MonadError[ReliableWriterT[F, E, W, *], E] {
       override def pure[A](x: A): ReliableWriterT[F, E, W, A] = ReliableWriterT(
         F.pure((W.empty, Right(x)))
@@ -75,9 +72,7 @@ object ReliableWriterT {
     }
 
   import cats.mtl.Tell
-  implicit def reliableWriterTTell[F[_], E, L](using
-      A: Applicative[F]
-  ): Tell[ReliableWriterT[F, E, L, *], L] =
+  given reliableWriterTTell: [F[_], E, L] => (A: Applicative[F]) => Tell[ReliableWriterT[F, E, L, *], L] =
     new Tell[ReliableWriterT[F, E, L, *], L] {
       def functor: Functor[ReliableWriterT[F, E, L, *]] =
         new Functor[ReliableWriterT[F, E, L, *]]:

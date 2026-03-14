@@ -1,7 +1,7 @@
 import sbt._
 import Dependencies._
 
-ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / scalaVersion := "3.8.2"
 ThisBuild / version      := "0.0.1"
 ThisBuild / organization := "io.koff"
 ThisBuild / scalacOptions ++= Seq(
@@ -25,6 +25,9 @@ lazy val `effect-gathering` = project
 
 lazy val `lens-derivation` = project
   .in(file("lens-derivation"))
+  .settings(libraryDependencies ++= all)
+
+lazy val `adt-interface-mapping` = project.in(file("adt-interface-mapping"))
   .settings(libraryDependencies ++= all)
 
 lazy val `error-handling` = project.in(file("error-handling"))

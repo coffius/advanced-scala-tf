@@ -21,7 +21,7 @@ object NonEmptyProductOf {
     type MirroredMonoType = T
     type MirroredElemTypes <: NonEmptyTuple
   }
-  inline given nonEmptyProductOf[S <: Product](using m: Mirror.ProductOf[S]): NonEmptyProductOf[S] =
+  inline given nonEmptyProductOf: [S <: Product] => (m: Mirror.ProductOf[S]) => NonEmptyProductOf[S] =
     inline erasedValue[m.MirroredElemTypes] match
       case _: NonEmptyTuple =>
         val asNonEmpty = m.asInstanceOf[AsNonEmpty[S]]

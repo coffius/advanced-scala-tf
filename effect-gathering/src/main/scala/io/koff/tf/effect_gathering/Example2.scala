@@ -29,7 +29,7 @@ trait Example2 extends BasicTypes {
       Console[F].println(s"ERROR - tag: $tag; input: $input; error: $error")
 
   /** Another way is to put our logs into the F[_] effect using the Tell[..] type class. */
-  protected final class InEffectTagLog[F[_]](implicit T: TellLogs[F]) extends Log[F]:
+  protected final class InEffectTagLog[F[_]](using T: TellLogs[F]) extends Log[F]:
     override def info(tag: String, input: String, output: String): F[Unit] =
       Log.Info(tag, input, output).tell[F]
 
@@ -65,7 +65,7 @@ trait Example2 extends BasicTypes {
     yield out2
 }
 object Example2 extends Example2 with IOApp.Simple:
-  private def program[F[_]: Log: Monad]: F[(Output1, Output2)] =
+  private def program[F[_]: {Log, Monad}]: F[(Output1, Output2)] =
     val lowLvlOp1: Input1 => F[Output1]  = s => s.length.pure
     val lowLvlOp2: Output1 => F[Output2] = i => i.toDouble.pure
     val lowLvlOp3: Input2 => F[Output1]  = l => l.size.pure

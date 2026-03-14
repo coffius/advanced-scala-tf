@@ -53,7 +53,7 @@ trait Example {
       context <- A.ask
       result  <- verify(context)
       output <-
-        if (result)
+        if result then
           layer3.operation3(in)
         else
           // Better way of working with errors

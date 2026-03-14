@@ -20,14 +20,13 @@ object DGetter {
   def id[A]: DGetter[A, A] = new DGetter[A, A]:
     override def get(s: A): A = s
 
-  inline given emptyTupleGetter[S]: DGetter[S, EmptyTuple] = new DGetter[S, EmptyTuple]:
+  inline given emptyTupleGetter: [S] => DGetter[S, EmptyTuple] = new DGetter[S, EmptyTuple]:
     override def get(s: S): EmptyTuple = EmptyTuple
-  inline given tupleHeadLens[S](using
-      m: NonEmptyProductOf[S]
-  ): DGetter[S, Head[m.MirroredElemTypes]] = new DGetter[S, Head[m.MirroredElemTypes]]:
-    override def get(s: S): Head[m.MirroredElemTypes] = m.convert(s).head
+  inline given tupleHeadLens: [S] => (m: NonEmptyProductOf[S]) => DGetter[S, Head[m.MirroredElemTypes]] =
+    new DGetter[S, Head[m.MirroredElemTypes]]:
+      override def get(s: S): Head[m.MirroredElemTypes] = m.convert(s).head
 
-  given tupleTailLens[S](using m: NonEmptyProductOf[S]): DGetter[S, Tail[m.MirroredElemTypes]] =
+  given tupleTailLens: [S] => (m: NonEmptyProductOf[S]) => DGetter[S, Tail[m.MirroredElemTypes]] =
     (s: S) => m.convert(s).tail
 
 }
@@ -45,7 +44,7 @@ trait DLens[S, A] extends DGetter[S, A] {
 }
 
 object DLens {
-  implicit def id[A]: DLens[A, A] = new DLens[A, A]:
+  given id: [A] => DLens[A, A] = new DLens[A, A]:
     override def get(s: A): A          = s
     override def modify(s: A, a: A): A = a
 }

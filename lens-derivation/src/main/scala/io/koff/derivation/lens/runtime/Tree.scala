@@ -12,15 +12,14 @@ object Algorithm {
   def findPath(start: FieldType, toFind: FieldType): Option[NonEmptyList[FieldType]] = {
     start match
       case fType @ FieldType.Simple(name) =>
-        if (toFind.name == name) {
+        if toFind.name == name then
           Some(NonEmptyList.one(fType))
-        } else {
+        else
           None
-        }
       case fType @ FieldType.Complex(name, fields) =>
-        if (toFind.name == name) {
+        if toFind.name == name then
           Some(NonEmptyList.one(fType))
-        } else {
+        else {
           val zero: Option[NonEmptyList[FieldType]] = None
           fields.foldLeft(zero) { (acc, field) =>
             acc match

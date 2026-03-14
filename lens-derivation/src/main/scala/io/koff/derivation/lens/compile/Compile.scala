@@ -5,11 +5,12 @@ import scala.compiletime.{erasedValue, error, summonInline}
 object Compile {
   private inline def getFromTuple[T <: Tuple, A](t: T): A = inline t match
     case tup: (head *: tail) =>
+      val concreteTup = tup.asInstanceOf[head *: tail]
       inline erasedValue[head] match
         case _: A =>
           val ev = summonInline[head =:= A]
-          ev(tup.head)
-        case _ => getFromTuple[tail, A](tup.tail)
+          ev(concreteTup.head)
+        case _ => getFromTuple[tail, A](concreteTup.tail)
     case _ => error("value of A not found in Tuple")
   def main(args: Array[String]): Unit = {
     inline def tuple1: (Long, String, Double) = (1L, "string", 0.0d)
